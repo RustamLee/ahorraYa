@@ -95,15 +95,17 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> getDiscountsByFilter(Optional<String> bankName,
-                                               Optional<String> storeName,
+                                               Optional<UUID> shopId,
                                                Optional<DayOfWeek> dayOfWeek,
                                                Optional<CardType> cardType,
                                                Optional<UUID> userId) {
         Specification<Discount> spec = Specification.where(DiscountSpecification.hasBankName(bankName))
-                .and(DiscountSpecification.hasStoreName(storeName))
+                .and(DiscountSpecification.hasStoreName(shopId))
                 .and(DiscountSpecification.hasDayOfWeek(dayOfWeek))
                 .and(DiscountSpecification.hasCardType(cardType))
                 .and(DiscountSpecification.hasUserId(userId));
+        System.out.println("Specification: " + spec);
+
         return discountRepository.findAll(spec);
     }
 

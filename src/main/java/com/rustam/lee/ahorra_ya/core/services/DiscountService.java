@@ -17,7 +17,7 @@ public interface DiscountService {
     Discount updateDiscount(UUID discountId, Discount discount);
 
     List<Discount> getDiscountsByFilter(Optional<String> bankName,
-                                        Optional<String> storeName,
+                                        Optional<UUID> shopId,
                                         Optional<DayOfWeek> dayOfWeek,
                                         Optional<CardType> cardType,
                                         Optional<UUID> userId);

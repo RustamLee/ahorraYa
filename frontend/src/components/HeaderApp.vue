@@ -6,6 +6,49 @@
         <p class="slogan">Save money with us</p>
       </div>
 
+      <!-- Фильтры -->
+      <div class="filters-container">
+        <label for="day-filter">Day:</label>
+        <select id="day-filter" @change="handleDayChange">
+          <option value="all">All</option>
+          <option value="monday">Monday</option>
+          <option value="tuesday">Tuesday</option>
+          <option value="wednesday">Wednesday</option>
+          <option value="thursday">Thursday</option>
+          <option value="friday">Friday</option>
+          <option value="saturday">Saturday</option>
+          <option value="sunday">Sunday</option>
+        </select>
+
+        <!-- Остальные фильтры -->
+        <label>
+          Store:
+          <select v-model="selectedStore"
+                  @change="handleStoreChange"
+                  id="store-filter">
+            <option value="all">All</option>
+            <option v-for="shop in shops" :key="shop.id" :value="shop.id">{{ shop.name }}</option>
+          </select>
+        </label>
+
+        <label>
+          Bank:
+          <select v-model="selectedBank">
+            <option value="all">All</option>
+            <option v-for="bank in banks" :key="bank" :value="bank">{{ bank }}</option>
+          </select>
+        </label>
+
+        <label>
+          Card:
+          <select v-model="selectedCard">
+            <option value="all">All</option>
+            <option value="debit">Debit</option>
+            <option value="credit">Credit</option>
+          </select>
+        </label>
+      </div>
+
       <!-- Меню и иконка пользователя -->
       <div class="right-section">
         <!-- Иконка пользователя и имя -->
@@ -16,8 +59,6 @@
         <!-- Меню -->
         <nav class="nav">
           <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Discounts</a></li>
             <li><a href="#">Contact</a></li>
           </ul>
         </nav>
@@ -26,16 +67,39 @@
   </header>
 </template>
 
-<script>
-export default {
-  name: 'HeaderApp',
+<script setup>
+import {defineEmits, onMounted, ref} from 'vue';
+import axios from "axios";
+
+const emit = defineEmits(['day-changed', 'store-changed']);
+const shops = ref([]);
+const banks = ref([]);
+const selectedStore = ref('all');
+const selectedBank = ref("all");
+const selectedCard = ref("all");
+const getShops = async () => {
+  try {
+    const response = await
+        axios.get('http://localhost:8081/shops');
+    shops.value = await response.data;
+  } catch (error) {
+    console.error('Error fetching shops', error);
+  }
+};
+
+function handleDayChange(event) {
+  const selectedDay = event.target.value === 'all' ? null : event.target.value; // Преобразование значения
+  emit('day-changed', selectedDay); // Передача значения в родительский компонент
 }
+function handleStoreChange(){
+  console.log("handleStoreChange called with:", selectedStore.value);
+  emit('store-changed', selectedStore.value);
+}
+onMounted(getShops);
 </script>
-
 <style>
-/* Стили для хедера */
 
-header{
+header {
   background-color: #ffe602;
   width: 100%; /* Фон на всю ширину экрана */
   display: flex;
@@ -54,7 +118,42 @@ header{
   max-width: 1200px;
 }
 
-/* Контейнер для логотипа и лозунга */
+.filters-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 100%;
+  font-size: 14px;
+  font-weight: normal;
+  color: #4e4e4e;
+}
+
+.filters-container select {
+  min-width: 60px;
+  background: #eae8eb;
+  font-size: 14px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #4e4e4e;
+
+}
+
+.filters-container select:hover {
+  background: #dcdadb;
+}
+
+.filters-container select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  color: #4e4e4e;
+}
+
+
 .logo-container {
   text-align: left;
   justify-content: flex-start;
@@ -86,6 +185,8 @@ header{
 .user-info {
   display: flex;
   align-items: center;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 .user-icon {
@@ -107,13 +208,13 @@ header{
   align-items: flex-end; /* Прижимаем меню к нижнему краю */
   height: 100%;
   color: #4e4e4e;
+
 }
 
 .nav li {
   margin-left: 20px;
-  color: #4e4e4e;/* отступы между пунктами меню */
+  color: #4e4e4e; /* отступы между пунктами меню */
 }
-
 
 
 .nav a {
@@ -121,5 +222,7 @@ header{
   font-size: 14px;
   font-weight: normal;
   color: #4e4e4e;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 </style>

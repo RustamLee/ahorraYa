@@ -16,17 +16,23 @@ public class DiscountSpecification {
         ).orElse(null);
     }
 
-    public static Specification<Discount> hasStoreName(Optional<String> storeName) {
-        return (root, query, criteriaBuilder) -> storeName.map(name ->
-                criteriaBuilder.equal(root.get("shop").get("name"), name)
+    public static Specification<Discount> hasStoreName(Optional<UUID> shopId) {
+        return (root, query, criteriaBuilder) -> shopId.map(id ->
+                criteriaBuilder.equal(root.get("shop").get("id"), id)
         ).orElse(null);
     }
 
+
     public static Specification<Discount> hasDayOfWeek(Optional<DayOfWeek> dayOfWeek) {
-        return (root, query, criteriaBuilder) -> dayOfWeek.map(day ->
-                criteriaBuilder.equal(root.get("dayOfWeek"), day)
-        ).orElse(null);
+        return (root, query, criteriaBuilder) -> {
+            if (dayOfWeek.isPresent()) {
+                System.out.println("Applying filter for dayOfWeek: " + dayOfWeek.get());
+            }
+            return dayOfWeek.map(day -> criteriaBuilder.equal(root.get("dayOfWeek"), day))
+                    .orElse(criteriaBuilder.conjunction());  // Возвращаем conjunction вместо null
+        };
     }
+
 
     public static Specification<Discount> hasCardType(Optional<CardType> cardType) {
         return (root, query, criteriaBuilder) -> cardType.map(type ->

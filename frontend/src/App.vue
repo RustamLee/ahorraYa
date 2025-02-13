@@ -1,13 +1,16 @@
 <template>
   <div id="app">
-    <HeaderApp />
-    <CardsContainer>
+    <HeaderApp @day-changed="handleDayChange" @store-changed="handleStoreChange"/>
+    <CardsContainer :selected-day="selectedDay"
+                    :selected-store="selectedStore"
+    >
       <DiscountCard/>
     </CardsContainer>
   </div>
 </template>
 
 <script>
+import {ref} from "vue";
 import HeaderApp from "@/components/HeaderApp.vue";
 import CardsContainer from "@/components/CardsContainer.vue";
 import DiscountCard from "@/components/DiscountCard.vue";
@@ -19,7 +22,28 @@ export default {
     CardsContainer: CardsContainer,
     DiscountCard: DiscountCard,
   },
+  setup() {
+    const selectedDay = ref("all");
+    const selectedStore = ref("all");
+
+    const handleDayChange = (newDay) => {
+      selectedDay.value = newDay;
+    };
+    const handleStoreChange = (newStore) => {
+      console.log("App - handleStoreChange called with:", newStore);
+      selectedStore.value = newStore;
+    };
+
+
+    return {
+      selectedDay,
+      selectedStore,
+      handleDayChange,
+      handleStoreChange,
+    };
+  },
 };
+
 </script>
 
 <style>

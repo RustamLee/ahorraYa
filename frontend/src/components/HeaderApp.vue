@@ -41,9 +41,10 @@
           </select>
         </label>
 
-        <label>
+        <label for="card-filter">
           Card:
-          <select v-model="selectedCard">
+          <select id="card-filter" @change="handleCardChange"
+          >
             <option value="all">All</option>
             <option value="debit">Debit</option>
             <option value="credit">Credit</option>
@@ -73,12 +74,11 @@
 import {defineEmits, onMounted, ref} from 'vue';
 import axios from "axios";
 
-const emit = defineEmits(['day-changed', 'store-changed', 'bank-changed']);
+const emit = defineEmits(['day-changed', 'store-changed', 'bank-changed', 'card-changed']);
 const shops = ref([]);
 const banks = ref([]);
 const selectedStore = ref('all');
 const selectedBank = ref("all");
-const selectedCard = ref("all");
 const getShops = async () => {
   try {
     const response = await
@@ -102,6 +102,10 @@ const getBanks = async () => {
 function handleDayChange(event) {
   const selectedDay = event.target.value === 'all' ? null : event.target.value; // Преобразование значения
   emit('day-changed', selectedDay); // Передача значения в родительский компонент
+}
+function handleCardChange(event) {
+  const selectedCard = event.target.value === 'all' ? null : event.target.value; // Преобразование значения
+  emit('card-changed', selectedCard); // Передача значения в родительский компонент
 }
 function handleStoreChange(){
   emit('store-changed', selectedStore.value);

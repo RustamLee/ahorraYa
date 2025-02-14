@@ -2,11 +2,13 @@
   <div id="app">
     <HeaderApp @day-changed="handleDayChange"
                @store-changed="handleStoreChange"
-                @bank-changed="handleBankChange"
+               @bank-changed="handleBankChange"
+               @card-changed="handleCardChange"
     />
     <CardsContainer :selected-day="selectedDay"
                     :selected-store="selectedStore"
                     :selected-bank="selectedBank"
+                    :selected-card="selectedCard"
     >
       <DiscountCard/>
     </CardsContainer>
@@ -30,6 +32,7 @@ export default {
     const selectedDay = ref("all");
     const selectedStore = ref("all");
     const selectedBank = ref("all");
+    const selectedCard = ref("all");
     const handleDayChange = (newDay) => {
       selectedDay.value = newDay;
     };
@@ -41,15 +44,20 @@ export default {
       console.log("App - handleBankChange called with:", newBank);
       selectedBank.value = newBank;
     };
-
+    const handleCardChange = (newCard) => {
+      console.log("App - handleCardChange called with:", newCard);
+      selectedCard.value = newCard;
+    };
 
     return {
       selectedDay,
       selectedStore,
       selectedBank,
+      selectedCard,
       handleDayChange,
       handleStoreChange,
       handleBankChange,
+      handleCardChange,
     };
   },
 };

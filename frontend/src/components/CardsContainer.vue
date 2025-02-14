@@ -18,6 +18,7 @@ const props = defineProps({
   selectedDay: String,
   selectedStore: String,
   selectedBank: String,
+  selectedCard: String,
 });
 console.log("CardsContainer - selectedStore prop:", props.selectedStore);
 
@@ -47,6 +48,9 @@ const getDiscountsByFilter = async () => {
     if(props.selectedBank && props.selectedBank !== "all") {
       params.bankId = props.selectedBank;
     }
+    if(props.selectedCard && props.selectedCard !== "all") {
+      params.cardType = props.selectedCard.toUpperCase();
+    }
     const response = await axios.get("http://localhost:8081/discounts/filter", {
       params});
     discounts.value = response.data; // Сохраняем отфильтрованные скидки
@@ -56,12 +60,12 @@ const getDiscountsByFilter = async () => {
 };
 
 // Слушаем изменения selectedDay и вызываем соответствующий метод
-watch ([() => props.selectedDay, () => props.selectedStore, ()=>props.selectedBank], ([newDay, newStore,newBank]) => {
+watch ([() => props.selectedDay, () => props.selectedStore, ()=>props.selectedBank, ()=>props.selectedCard], ([newDay, newStore,newBank,newCard]) => {
   if (
       (newDay === "all" || !newDay) &&
       (newStore === "all" || !newStore) &&
-      (newBank === "all" || !newBank)
-
+      (newBank === "all" || !newBank) &&
+      (newCard === "all" || !newCard)
   ) {
     getAllDiscounts();
   } else {
@@ -73,7 +77,8 @@ onMounted(() => {
   if (
       (!props.selectedDay || props.selectedDay === "all") &&
       (!props.selectedStore || props.selectedStore === "all") &&
-      (!props.selectedBank || props.selectedBank === "all")
+      (!props.selectedBank || props.selectedBank === "all") &&
+      (!props.selectedCard || props.selectedCard === "all")
   ) {
     getAllDiscounts();
   } else {

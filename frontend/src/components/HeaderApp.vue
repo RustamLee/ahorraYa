@@ -49,6 +49,9 @@
             <option value="debit">Debit</option>
             <option value="credit">Credit</option>
           </select>
+        </label> New card:
+        <label>
+        <button>+</button>
         </label>
       </div>
 
@@ -103,20 +106,41 @@ function handleDayChange(event) {
   const selectedDay = event.target.value === 'all' ? null : event.target.value; // Преобразование значения
   emit('day-changed', selectedDay); // Передача значения в родительский компонент
 }
+
 function handleCardChange(event) {
   const selectedCard = event.target.value === 'all' ? null : event.target.value; // Преобразование значения
   emit('card-changed', selectedCard); // Передача значения в родительский компонент
 }
-function handleStoreChange(){
+
+function handleStoreChange() {
   emit('store-changed', selectedStore.value);
 }
+
 onMounted(getShops);
-function handleBankChange(){
+
+function handleBankChange() {
   emit('bank-changed', selectedBank.value);
 }
+
 onMounted(getBanks);
 </script>
 <style>
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px; /* Размер кнопки */
+  height: 38px; /* Делаем квадратной */
+  font-size: 24px; /* Размер плюса */
+  font-weight: bold;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: #3483fa;
+  color: white;
+}
+
 
 header {
   background-color: #ffe602;
@@ -140,13 +164,28 @@ header {
 .filters-container {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
   justify-content: space-between;
   align-items: flex-end;
   height: 100%;
   font-size: 14px;
   font-weight: normal;
   color: #4e4e4e;
+  position: relative;
+}
+
+button {
+  background-color: #3483fa;
+  font-weight: bold;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  min-width: 60px;
+  height: 18px;
+  display: flex;
+  text-align: center;
+  align-content: center;
 }
 
 .filters-container select {
@@ -158,7 +197,6 @@ header {
   cursor: pointer;
   transition: all 0.3s;
   color: #4e4e4e;
-
 }
 
 .filters-container select:hover {

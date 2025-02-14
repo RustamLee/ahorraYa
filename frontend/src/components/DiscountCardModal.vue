@@ -127,8 +127,8 @@ textarea {
 
 button {
   background-color: #3483fa;
-  font-weight: bold;
   color: white;
+  font-size: 14px;
   padding: 10px 20px;
   border: none;
   border-radius: 4px;

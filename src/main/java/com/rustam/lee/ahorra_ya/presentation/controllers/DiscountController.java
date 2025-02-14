@@ -104,19 +104,19 @@ public class DiscountController {
     // get discounts by filter  (bankName, storeName, dayOfWeek, cardType, userId)
     @GetMapping ("/filter")
     public ResponseEntity<List<Discount>> getDiscountsByFilter(
-            @RequestParam Optional<String> bankName,
+            @RequestParam Optional<UUID> bankId,
             @RequestParam Optional<UUID> shopId,
             @RequestParam Optional<DayOfWeek> dayOfWeek,
             @RequestParam Optional<CardType> cardType,
             @RequestParam Optional<UUID> userId) {
         System.out.println("Received parameters: ");
-        System.out.println("bankName: " + bankName);
+        System.out.println("bankName: " + bankId);
         System.out.println("shopId: " + shopId);
         System.out.println("dayOfWeek: " + dayOfWeek);
         System.out.println("cardType: " + cardType);
         System.out.println("userId: " + userId);
 
-        List<Discount> discounts = discountService.getDiscountsByFilter(bankName, shopId, dayOfWeek, cardType, userId);
+        List<Discount> discounts = discountService.getDiscountsByFilter(bankId, shopId, dayOfWeek, cardType, userId);
         return ResponseEntity.ok(discounts);
     }
 

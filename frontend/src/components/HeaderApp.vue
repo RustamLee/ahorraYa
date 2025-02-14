@@ -33,9 +33,11 @@
 
         <label>
           Bank:
-          <select v-model="selectedBank">
+          <select v-model="selectedBank"
+                  @change="handleBankChange"
+                  id="bank-filter">
             <option value="all">All</option>
-            <option v-for="bank in banks" :key="bank" :value="bank">{{ bank }}</option>
+            <option v-for="bank in banks" :key="bank.id" :value="bank.id">{{ bank.name }}</option>
           </select>
         </label>
 
@@ -71,7 +73,7 @@
 import {defineEmits, onMounted, ref} from 'vue';
 import axios from "axios";
 
-const emit = defineEmits(['day-changed', 'store-changed']);
+const emit = defineEmits(['day-changed', 'store-changed', 'bank-changed']);
 const shops = ref([]);
 const banks = ref([]);
 const selectedStore = ref('all');
@@ -87,15 +89,28 @@ const getShops = async () => {
   }
 };
 
+const getBanks = async () => {
+  try {
+    const response = await
+        axios.get('http://localhost:8081/banks');
+    banks.value = await response.data;
+  } catch (error) {
+    console.error('Error fetching banks', error);
+  }
+};
+
 function handleDayChange(event) {
   const selectedDay = event.target.value === 'all' ? null : event.target.value; // Преобразование значения
   emit('day-changed', selectedDay); // Передача значения в родительский компонент
 }
 function handleStoreChange(){
-  console.log("handleStoreChange called with:", selectedStore.value);
   emit('store-changed', selectedStore.value);
 }
 onMounted(getShops);
+function handleBankChange(){
+  emit('bank-changed', selectedBank.value);
+}
+onMounted(getBanks);
 </script>
 <style>
 

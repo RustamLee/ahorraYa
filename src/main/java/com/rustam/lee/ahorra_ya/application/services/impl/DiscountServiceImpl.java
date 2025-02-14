@@ -94,12 +94,12 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<Discount> getDiscountsByFilter(Optional<String> bankName,
+    public List<Discount> getDiscountsByFilter(Optional<UUID> bankId,
                                                Optional<UUID> shopId,
                                                Optional<DayOfWeek> dayOfWeek,
                                                Optional<CardType> cardType,
                                                Optional<UUID> userId) {
-        Specification<Discount> spec = Specification.where(DiscountSpecification.hasBankName(bankName))
+        Specification<Discount> spec = Specification.where(DiscountSpecification.hasBankName(bankId))
                 .and(DiscountSpecification.hasStoreName(shopId))
                 .and(DiscountSpecification.hasDayOfWeek(dayOfWeek))
                 .and(DiscountSpecification.hasCardType(cardType))

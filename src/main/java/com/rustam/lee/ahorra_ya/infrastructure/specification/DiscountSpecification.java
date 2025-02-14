@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public class DiscountSpecification {
 
-    public static Specification<Discount> hasBankName(Optional<String> bankName) {
-        return (root, query, criteriaBuilder) -> bankName.map(name ->
-                criteriaBuilder.equal(root.get("bank").get("name"), name)
+    public static Specification<Discount> hasBankName(Optional<UUID> bankId) {
+        return (root, query, criteriaBuilder) -> bankId.map(id ->
+                criteriaBuilder.equal(root.get("bank").get("id"), id)
         ).orElse(null);
     }
 

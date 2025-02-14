@@ -17,6 +17,7 @@ import DiscountCard from "@/components/DiscountCard.vue";
 const props = defineProps({
   selectedDay: String,
   selectedStore: String,
+  selectedBank: String,
 });
 console.log("CardsContainer - selectedStore prop:", props.selectedStore);
 
@@ -43,6 +44,9 @@ const getDiscountsByFilter = async () => {
     if(props.selectedStore && props.selectedStore !== "all") {
       params.shopId = props.selectedStore;
     }
+    if(props.selectedBank && props.selectedBank !== "all") {
+      params.bankId = props.selectedBank;
+    }
     const response = await axios.get("http://localhost:8081/discounts/filter", {
       params});
     discounts.value = response.data; // Сохраняем отфильтрованные скидки
@@ -52,8 +56,13 @@ const getDiscountsByFilter = async () => {
 };
 
 // Слушаем изменения selectedDay и вызываем соответствующий метод
-watch ([() => props.selectedDay, () => props.selectedStore], ([newDay, newStore]) => {
-  if ((newDay === "all" || !newDay) && (newStore === "all" || !newStore)) {
+watch ([() => props.selectedDay, () => props.selectedStore, ()=>props.selectedBank], ([newDay, newStore,newBank]) => {
+  if (
+      (newDay === "all" || !newDay) &&
+      (newStore === "all" || !newStore) &&
+      (newBank === "all" || !newBank)
+
+  ) {
     getAllDiscounts();
   } else {
     getDiscountsByFilter();
@@ -61,7 +70,11 @@ watch ([() => props.selectedDay, () => props.selectedStore], ([newDay, newStore]
 }, { immediate: true });
 
 onMounted(() => {
-  if ((!props.selectedDay || props.selectedDay === "all") && (!props.selectedStore || props.selectedStore === "all")) {
+  if (
+      (!props.selectedDay || props.selectedDay === "all") &&
+      (!props.selectedStore || props.selectedStore === "all") &&
+      (!props.selectedBank || props.selectedBank === "all")
+  ) {
     getAllDiscounts();
   } else {
     getDiscountsByFilter(); // Иначе применяем фильтры

@@ -1,8 +1,12 @@
 <template>
   <div id="app">
-    <HeaderApp @day-changed="handleDayChange" @store-changed="handleStoreChange"/>
+    <HeaderApp @day-changed="handleDayChange"
+               @store-changed="handleStoreChange"
+                @bank-changed="handleBankChange"
+    />
     <CardsContainer :selected-day="selectedDay"
                     :selected-store="selectedStore"
+                    :selected-bank="selectedBank"
     >
       <DiscountCard/>
     </CardsContainer>
@@ -25,7 +29,7 @@ export default {
   setup() {
     const selectedDay = ref("all");
     const selectedStore = ref("all");
-
+    const selectedBank = ref("all");
     const handleDayChange = (newDay) => {
       selectedDay.value = newDay;
     };
@@ -33,13 +37,19 @@ export default {
       console.log("App - handleStoreChange called with:", newStore);
       selectedStore.value = newStore;
     };
+    const handleBankChange = (newBank) => {
+      console.log("App - handleBankChange called with:", newBank);
+      selectedBank.value = newBank;
+    };
 
 
     return {
       selectedDay,
       selectedStore,
+      selectedBank,
       handleDayChange,
       handleStoreChange,
+      handleBankChange,
     };
   },
 };

@@ -5,6 +5,7 @@
         :key="discount.id"
         :discount="discount"
         @discount-deleted="removeDiscountFromList"
+        @discount-updated="handleDiscountUpdated"
     />
   </div>
 </template>
@@ -90,6 +91,12 @@ onMounted(() => {
 const removeDiscountFromList = (id) => {
   discounts.value = discounts.value.filter(discount => discount.id !== id);
 };
+
+const handleDiscountUpdated = (updatedDiscount) => {
+  const index = discounts.value.findIndex(discount => discount.id === updatedDiscount.id);
+  discounts.value[index] = updatedDiscount;
+};
+
 </script>
 
 

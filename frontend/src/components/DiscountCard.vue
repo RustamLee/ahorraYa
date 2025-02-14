@@ -1,11 +1,14 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import {defineProps, defineEmits, ref} from 'vue';
 import axios from "axios";
+
+import DiscountCardModal from "@/components/DiscountCardModal.vue";
+const showModal = ref(false);
 
 const props = defineProps({
   discount: Object
 });
-const emit = defineEmits(['discount-deleted']);
+const emit = defineEmits(['discount-deleted','discount-updated']);
 const deleteDiscount = async () => {
   try {
     await axios.delete(`http://localhost:8081/discounts/${props.discount.id}`);
@@ -15,7 +18,17 @@ const deleteDiscount = async () => {
     console.error("Error deleting discount", error);
   }
 };
+const openModal = () => {
+  showModal.value = true;
+};
 
+const closeModal = () => {
+  showModal.value = false;
+};
+
+const handleDiscountUpdated = (updatedDiscount) => {
+  emit('discount-updated', updatedDiscount);
+};
 </script>
 
 <template>
@@ -27,7 +40,7 @@ const deleteDiscount = async () => {
       <div><i class="ri-percent-line"></i>DISCOUNT</div>
       <div><i class="ri-money-dollar-box-line"></i>LIMIT</div>
       <div><i class="ri-time-line"></i>PERIOD</div>
-        <div class="edit-icon"><i class="ri-edit-line"></i></div>
+        <div class="edit-icon"  @click="openModal"><i class="ri-edit-line"></i></div>
     </div>
 
     <div class="data-row">
@@ -54,9 +67,14 @@ const deleteDiscount = async () => {
       <div><i class="ri-information-line"></i>DETAILS:</div>
       <div class="details-text">{{ discount.details }}</div>
     </div>
+
+    <DiscountCardModal
+        v-show="showModal"
+        :discount="discount"
+        @close="closeModal"
+        @discount-updated="handleDiscountUpdated"
+    />
   </div>
-
-
 </template>
 
 <style scoped>

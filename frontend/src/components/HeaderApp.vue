@@ -19,8 +19,6 @@
           <option value="saturday">Saturday</option>
           <option value="sunday">Sunday</option>
         </select>
-
-        <!-- Остальные фильтры -->
         <label>
           Store:
           <select v-model="selectedStore"
@@ -55,33 +53,33 @@
         </label>
       </div>
 
-      <!-- Меню и иконка пользователя -->
       <div class="right-section">
-        <!-- Иконка пользователя и имя -->
         <div class="user-info">
           <i class="ri-user-line user-icon"></i>
-          <span class="user-name">User</span>
+          <span class="user-name">Login</span>
         </div>
         <!-- Меню -->
         <nav class="nav">
           <ul>
-            <li><a href="#">Contact</a></li>
+            <li><button @click="showRegisterModal = true" class="register-btn">Sign Up</button></li>
           </ul>
         </nav>
       </div>
     </div>
-  </header>
-</template>
+    <RegisterModal v-if="showRegisterModal" @close="showRegisterModal = false" />
+  </header></template>
 
 <script setup>
 import {defineEmits, onMounted, ref} from 'vue';
 import axios from "axios";
+import RegisterModal from "@/components/RegisterModal.vue";
 
 const emit = defineEmits(['day-changed', 'store-changed', 'bank-changed', 'card-changed']);
 const shops = ref([]);
 const banks = ref([]);
 const selectedStore = ref('all');
 const selectedBank = ref("all");
+const showRegisterModal = ref(false);
 const getShops = async () => {
   try {
     const response = await
@@ -126,13 +124,25 @@ onMounted(getBanks);
 </script>
 <style>
 
+.register-btn{
+  padding: 0;
+  color: #4e4e4e;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: normal;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: none;
+  font-family: 'Poppins', sans-serif;
+}
+
 button {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 60px; /* Размер кнопки */
-  height: 38px; /* Делаем квадратной */
-  font-size: 24px; /* Размер плюса */
+  min-width: 60px;
+  height: 38px;
+  font-size: 24px;
   font-weight: bold;
   border: none;
   border-radius: 50%;
@@ -144,7 +154,7 @@ button {
 
 header {
   background-color: #ffe602;
-  width: 100%; /* Фон на всю ширину экрана */
+  width: 100%;
   display: flex;
   justify-content: center;
 }
@@ -217,7 +227,7 @@ button {
 }
 
 .app-name {
-  font-size: 2rem; /* увеличиваем размер шрифта для названия */
+  font-size: 2rem;
   margin: 0;
 }
 
@@ -225,20 +235,18 @@ button {
   font-size: 14px;
   margin-top: 5px;
   font-weight: normal;
-  align-self: flex-end; /* прижимаем слоган к нижнему краю */
+  align-self: flex-end;
 }
 
-/* Правая часть хедера (меню и иконка пользователя) */
 .right-section {
   margin-top: 15px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
-  height: 100%; /* Для того чтобы пункты меню прижались к низу */
+  height: 100%;
 }
 
-/* Иконка пользователя и имя */
 .user-info {
   display: flex;
   align-items: center;
@@ -247,7 +255,7 @@ button {
 }
 
 .user-icon {
-  border-radius: 50%; /* делаем круглый вид для иконки */
+  border-radius: 50%;
   margin-right: 10px;
 }
 
@@ -257,12 +265,12 @@ button {
 
 /* Меню */
 .nav ul {
-  list-style-type: none; /* убираем маркеры списка */
+  list-style-type: none;
   margin: 0;
   padding: 0;
-  display: flex; /* Меню в строку */
-  justify-content: flex-end; /* Выравниваем пункты меню по правому краю */
-  align-items: flex-end; /* Прижимаем меню к нижнему краю */
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
   height: 100%;
   color: #4e4e4e;
 
@@ -270,12 +278,12 @@ button {
 
 .nav li {
   margin-left: 20px;
-  color: #4e4e4e; /* отступы между пунктами меню */
+  color: #4e4e4e;
 }
 
 
 .nav a {
-  text-decoration: none; /* убираем подчеркивание */
+  text-decoration: none;
   font-size: 14px;
   font-weight: normal;
   color: #4e4e4e;

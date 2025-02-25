@@ -1,5 +1,5 @@
 <template>
-  <div class="modal">
+  <div class="modal" @click.self="closeModal">
     <div class="modal-content">
       <i class="ri-close-line close" @click="closeModal"></i>
       <h2>Change Discount</h2>

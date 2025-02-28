@@ -6,21 +6,22 @@
         <p class="slogan">Save money with us</p>
       </div>
 
-      <!-- Фильтры -->
+      <!-- filters -->
       <div class="filters-container">
-        <label for="day-filter">Day:</label>
-        <select id="day-filter" @change="handleDayChange">
-          <option value="all">All</option>
-          <option value="monday">Monday</option>
-          <option value="tuesday">Tuesday</option>
-          <option value="wednesday">Wednesday</option>
-          <option value="thursday">Thursday</option>
-          <option value="friday">Friday</option>
-          <option value="saturday">Saturday</option>
-          <option value="sunday">Sunday</option>
-        </select>
+        <label for="day-filter">Day
+          <select id="day-filter" @change="handleDayChange">
+            <option value="all">All</option>
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+          </select>
+        </label>
         <label>
-          Store:
+          Store
           <select v-model="selectedStore"
                   @change="handleStoreChange"
                   id="store-filter">
@@ -30,7 +31,7 @@
         </label>
 
         <label>
-          Bank:
+          Bank
           <select v-model="selectedBank"
                   @change="handleBankChange"
                   id="bank-filter">
@@ -40,46 +41,63 @@
         </label>
 
         <label for="card-filter">
-          Card:
+          Card
           <select id="card-filter" @change="handleCardChange"
           >
             <option value="all">All</option>
             <option value="debit">Debit</option>
             <option value="credit">Credit</option>
           </select>
-        </label> New card:
-        <label>
-        <button>+</button>
+        </label>
+        <label v-if="userEmail">
+          <button class="new-card">new card</button>
         </label>
       </div>
 
       <div class="right-section">
-        <div class="user-info">
-          <i class="ri-user-line user-icon"></i>
-          <span class="user-name">Login</span>
+        <div v-if="userEmail" class="user-info">
+          <span class="user-name">{{ userEmail }}</span>
+          <button @click="authStore.logout()" class="register-btn">Log Out</button>
         </div>
-        <!-- Меню -->
-        <nav class="nav">
-          <ul>
-            <li><button @click="showRegisterModal = true" class="register-btn">Sign Up</button></li>
-          </ul>
-        </nav>
+        <div v-else class="nav">
+          <button @click="showLoginModal = true" class="register-btn">Log In</button>
+          <button @click="showRegisterModal = true" class="register-btn">Sign Up</button>
+        </div>
+
       </div>
     </div>
-    <RegisterModal v-if="showRegisterModal" @close="showRegisterModal = false" />
-  </header></template>
+    <RegisterModal
+        v-if="showRegisterModal"
+        @close="showRegisterModal = false"
+        @login="showRegisterModal = false;
+                showLoginModal = true"/>
+    <LoginModal v-if="showLoginModal" @close="showLoginModal = false"/>
+  </header>
+</template>
 
 <script setup>
 import {defineEmits, onMounted, ref} from 'vue';
+import {watchEffect} from 'vue';
+
 import axios from "axios";
 import RegisterModal from "@/components/RegisterModal.vue";
+import LoginModal from "@/components/LoginModal.vue";
+import {useAuthStore} from "@/store";
 
+const authStore = useAuthStore();
+const userEmail = ref(authStore.userEmail);
+
+watchEffect(() => {
+  userEmail.value = authStore.userEmail;
+  console.log('Updated userEmail:', userEmail.value);
+});
 const emit = defineEmits(['day-changed', 'store-changed', 'bank-changed', 'card-changed']);
 const shops = ref([]);
 const banks = ref([]);
 const selectedStore = ref('all');
 const selectedBank = ref("all");
 const showRegisterModal = ref(false);
+const showLoginModal = ref(false);
 const getShops = async () => {
   try {
     const response = await
@@ -124,33 +142,43 @@ onMounted(getBanks);
 </script>
 <style>
 
-.register-btn{
-  padding: 0;
+.register-btn {
   color: #4e4e4e;
   text-decoration: none;
-  font-size: 16px;
   font-weight: normal;
   cursor: pointer;
   transition: all 0.3s;
-  background: none;
+  font-size: 16px;
   font-family: 'Poppins', sans-serif;
+  padding: 0;
+  white-space: nowrap;
+  align-items: center;
+  background: none;
+  justify-content: flex-start;
+}
+
+.new-card {
+  font-size: 16px;
 }
 
 button {
+  white-space: nowrap;
   display: flex;
-  align-items: center;
-  justify-content: center;
   min-width: 60px;
-  height: 38px;
   font-size: 24px;
   font-weight: bold;
   border: none;
-  border-radius: 50%;
   cursor: pointer;
   background-color: #3483fa;
   color: white;
-}
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px;
+  border-radius: 5px;
+  height: 18px;
+  text-align: center;
 
+}
 
 header {
   background-color: #ffe602;
@@ -181,21 +209,6 @@ header {
   font-weight: normal;
   color: #4e4e4e;
   position: relative;
-}
-
-button {
-  background-color: #3483fa;
-  font-weight: bold;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  min-width: 60px;
-  height: 18px;
-  display: flex;
-  text-align: center;
-  align-content: center;
 }
 
 .filters-container select {
@@ -239,55 +252,34 @@ button {
 }
 
 .right-section {
-  margin-top: 15px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: flex-end;
-  height: 100%;
 }
 
 .user-info {
-  display: flex;
-  align-items: center;
   cursor: pointer;
   transition: all 0.3s;
-}
-
-.user-icon {
-  border-radius: 50%;
-  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: space-between;
+  height: 100%;
+  padding: 5px;
 }
 
 .user-name {
   font-size: 1rem;
 }
 
-/* Меню */
-.nav ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+.nav {
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
   height: 100%;
-  color: #4e4e4e;
-
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5px;
 }
 
-.nav li {
-  margin-left: 20px;
-  color: #4e4e4e;
-}
-
-
-.nav a {
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: normal;
-  color: #4e4e4e;
-  cursor: pointer;
-  transition: all 0.3s;
-}
 </style>

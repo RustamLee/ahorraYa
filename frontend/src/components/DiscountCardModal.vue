@@ -61,7 +61,6 @@ const closeModal = () => {
 </script>
 
 <style scoped>
-/* Стили для модального окна */
 
 span{
   font-size: 12px;

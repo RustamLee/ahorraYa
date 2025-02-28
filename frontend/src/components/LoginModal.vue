@@ -1,60 +1,63 @@
 <script setup>
-import {defineEmits, ref, toRaw} from 'vue';
-import axios from "axios";
+import {defineEmits, ref} from 'vue';
+import api from '@/axios';
+import {useAuthStore} from "@/store";
 
-const emit = defineEmits(['close', 'register-success', 'login']);
+const authStore = useAuthStore();
+const emit = defineEmits(['close', 'login-success']);
 const form = ref({
   email: '',
   password: ''
 });
 
 const errorMessage = ref('');
-const successMessage = ref("");
-const showLogin = ref(false);
+const successMessage = ref('');
 
 const closeModal = () => {
-  successMessage.value = "";
+  successMessage.value = '';
   errorMessage.value = '';
-  showLogin.value = false;
   emit('close');
 };
 
+console.log(authStore);
 const handleSubmit = async () => {
-  successMessage.value = "";
-  errorMessage.value = "";
-  showLogin.value = false;
+  console.log('handleSubmit called');
+
+  successMessage.value = '';
+  errorMessage.value = '';
 
   try {
-    const rawData = toRaw(form.value);  // Убираем прокси
-    console.log("Sending data:", rawData);
-
-    await axios.post("http://localhost:8081/users/register", {
-      email: rawData.email,
-      password: rawData.password
+    const response = await api.post('/auth/login', {
+      email: form.value.email,
+      password: form.value.password
     });
-
-    successMessage.value = "Registration successful!";
+    const token = response.data.token;
+    const email = response.data.email;
+    console.log('API response:', response.data);
+    localStorage.setItem('AuthToken', token);
+    authStore.setUserEmail(email);
+    console.log('Saved email:', authStore.userEmail);
+    successMessage.value = 'Login successful!';
     setTimeout(() => {
       closeModal();
-      emit("register-success");
-    }, 3000);
-
+      emit('login-success', token);
+    }, 2000);
   } catch (error) {
-    if (error.response?.status === 409) {
-      console.error("Registration error:", error.response);
-      errorMessage.value = "The user already exists. Do you want to log in?";
-      showLogin.value = true;
+    if (error.response?.status === 401) {
+      errorMessage.value = 'Invalid email or password.';
     } else {
-      errorMessage.value = `Error registration: ${error.response?.data?.message || 'Unknown error'}`;
+      errorMessage.value = 'Error logging in. Please try again.';
     }
   }
 };
+
+
 </script>
 
 <template>
   <div class="modal" @click.self="closeModal">
     <div class="modal-content">
-      <h2>Sign Up</h2>
+      <h2>Log In</h2>
       <form @submit.prevent="handleSubmit">
         <div>
           <label for="email">Email:</label>
@@ -67,8 +70,7 @@ const handleSubmit = async () => {
         <p v-if="successMessage" class="success">{{ successMessage }}</p>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         <div class="button-container">
-          <button v-if="!showLogin" type="submit">Save</button>
-          <button v-else @click="$emit('login')">Login</button>
+          <button @click="handleSubmit" type="submit">Login</button>
         </div>
       </form>
       <i class="ri-close-line close" @click="closeModal"></i>
@@ -83,16 +85,15 @@ const handleSubmit = async () => {
   margin-top: 10px;
 }
 
-.button-container {
-  display: flex;
-  justify-content: center;
-}
-
 .error {
   color: #c53838;
   font-size: 14px;
-  margin-top: 20px;
-  margin-bottom: 0;
+  margin-top: 10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
 }
 
 input {

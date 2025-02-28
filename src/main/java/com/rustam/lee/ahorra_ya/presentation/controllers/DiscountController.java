@@ -3,7 +3,7 @@ package com.rustam.lee.ahorra_ya.presentation.controllers;
 import com.rustam.lee.ahorra_ya.core.domain.entities.Bank;
 import com.rustam.lee.ahorra_ya.core.domain.entities.Discount;
 import com.rustam.lee.ahorra_ya.core.domain.entities.Shop;
-import com.rustam.lee.ahorra_ya.core.domain.entities.User;
+import com.rustam.lee.ahorra_ya.core.domain.entities.UserEntity;
 import com.rustam.lee.ahorra_ya.core.domain.enums.CardType;
 import com.rustam.lee.ahorra_ya.core.domain.enums.DayOfWeek;
 import com.rustam.lee.ahorra_ya.core.services.BankService;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/discounts")
@@ -54,7 +53,7 @@ public class DiscountController {
             @RequestParam UUID shopId,
             @RequestBody Discount discount) {
 
-        Optional<User> user = userService.getUserById(userId);
+        Optional<UserEntity> user = userService.getUserById(userId);
         Optional<Bank> bank = bankService.getBankById(bankId);
         Optional<Shop> shop = shopService.getShopById(shopId);
 

@@ -1,6 +1,6 @@
 package com.rustam.lee.ahorra_ya.presentation.controllers;
 
-import com.rustam.lee.ahorra_ya.core.domain.entities.User;
+import com.rustam.lee.ahorra_ya.core.domain.entities.UserEntity;
 import com.rustam.lee.ahorra_ya.core.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +18,11 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userService.createUser(user);
+    @PostMapping("/register")
+    public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
+        System.out.println("Received request to create user: " + user);
+        UserEntity savedUser = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
+
 }

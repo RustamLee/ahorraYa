@@ -25,17 +25,15 @@ console.log("CardsContainer - selectedStore prop:", props.selectedStore);
 
 const discounts = ref([]);
 
-// Метод для получения всех скидок
 const getAllDiscounts = async () => {
   try {
     const response = await axios.get("http://localhost:8081/discounts");
-    discounts.value = response.data; // Сохраняем все скидки
+    discounts.value = response.data;
   } catch (error) {
     console.error("Error fetching all discounts", error);
   }
 };
 
-// Метод для получения скидок по фильтру
 const getDiscountsByFilter = async () => {
   console.log("CardsContainer - getDiscountsByFilter called");
   try {
@@ -54,13 +52,12 @@ const getDiscountsByFilter = async () => {
     }
     const response = await axios.get("http://localhost:8081/discounts/filter", {
       params});
-    discounts.value = response.data; // Сохраняем отфильтрованные скидки
+    discounts.value = response.data;
   } catch (error) {
     console.error("Error fetching discounts", error);
   }
 };
 
-// Слушаем изменения selectedDay и вызываем соответствующий метод
 watch ([() => props.selectedDay, () => props.selectedStore, ()=>props.selectedBank, ()=>props.selectedCard], ([newDay, newStore,newBank,newCard]) => {
   if (
       (newDay === "all" || !newDay) &&
@@ -83,11 +80,10 @@ onMounted(() => {
   ) {
     getAllDiscounts();
   } else {
-    getDiscountsByFilter(); // Иначе применяем фильтры
+    getDiscountsByFilter();
   }
 });
 
-// Функция для удаления скидки из списка
 const removeDiscountFromList = (id) => {
   discounts.value = discounts.value.filter(discount => discount.id !== id);
 };

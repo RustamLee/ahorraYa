@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -23,7 +22,7 @@ public class Discount {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bank_id", referencedColumnName = "id", nullable = false)
@@ -60,7 +59,7 @@ public class Discount {
     // constructor
     public Discount() {
     }
-    public Discount(User user, Bank bank, Shop shop, DayOfWeek dayOfWeek, double discount,
+    public Discount(UserEntity user, Bank bank, Shop shop, DayOfWeek dayOfWeek, double discount,
                     double discountLimit, CardType cardType, LimitType limitType, String details) {
         this.user = user;
         this.bank = bank;
@@ -84,11 +83,11 @@ public class Discount {
         this.id = id;
     }
 
-    public User getUser() {
+    public UserEntity getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserEntity user) {
         this.user = user;
     }
 

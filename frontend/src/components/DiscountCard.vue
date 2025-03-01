@@ -57,7 +57,7 @@ const handleDiscountUpdated = (updatedDiscount) => {
       <div
           v-for="day in ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']"
           :key="day"
-          :class="{ active: discount && discount.dayOfWeek === day }"
+          :class="{ active: discount && (discount.dayOfWeek === 'ALL' || discount.dayOfWeek === day) }"
       >
         {{ day.charAt(0) + day.slice(1).toLowerCase() }}
       </div>

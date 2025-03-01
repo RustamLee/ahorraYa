@@ -50,7 +50,7 @@
           </select>
         </label>
         <label v-if="userEmail">
-          <button class="new-card">new card</button>
+          <button class="new-card"  @click="openModal">new card</button>
         </label>
       </div>
 
@@ -72,20 +72,34 @@
         @login="showRegisterModal = false;
                 showLoginModal = true"/>
     <LoginModal v-if="showLoginModal" @close="showLoginModal = false"/>
+    <CardModal
+        v-if="isModalOpen"
+        @close="isModalOpen = false"
+        @save="handleSave"
+    />
   </header>
 </template>
 
 <script setup>
 import {defineEmits, onMounted, ref} from 'vue';
 import {watchEffect} from 'vue';
-
-import axios from "axios";
 import RegisterModal from "@/components/RegisterModal.vue";
 import LoginModal from "@/components/LoginModal.vue";
 import {useAuthStore} from "@/store";
+import CardModal from "@/components/CardModal.vue";
+import api from "@/axios";
 
+const isModalOpen = ref(false);
 const authStore = useAuthStore();
 const userEmail = ref(authStore.userEmail);
+const openModal = () => {
+  isModalOpen.value = true;
+};
+const handleSave = (cardData) => {
+  console.log('Saving new card:', cardData);
+  // Тут можно вызвать API для сохранения новой карточки
+  isModalOpen.value = false;
+};
 
 watchEffect(() => {
   userEmail.value = authStore.userEmail;
@@ -101,7 +115,7 @@ const showLoginModal = ref(false);
 const getShops = async () => {
   try {
     const response = await
-        axios.get('http://localhost:8081/shops');
+        api.get('/shops');
     shops.value = await response.data;
   } catch (error) {
     console.error('Error fetching shops', error);
@@ -111,7 +125,7 @@ const getShops = async () => {
 const getBanks = async () => {
   try {
     const response = await
-        axios.get('http://localhost:8081/banks');
+        api.get('/banks');
     banks.value = await response.data;
   } catch (error) {
     console.error('Error fetching banks', error);
@@ -119,9 +133,10 @@ const getBanks = async () => {
 };
 
 function handleDayChange(event) {
-  const selectedDay = event.target.value === 'all' ? null : event.target.value; // Преобразование значения
-  emit('day-changed', selectedDay); // Передача значения в родительский компонент
+  const selectedDay = event.target.value === 'all' ? 'all' : event.target.value;
+  emit('day-changed', selectedDay); // Передаем выбранный день в родительский компонент
 }
+
 
 function handleCardChange(event) {
   const selectedCard = event.target.value === 'all' ? null : event.target.value; // Преобразование значения

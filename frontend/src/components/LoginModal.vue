@@ -20,37 +20,47 @@ const closeModal = () => {
 };
 
 console.log(authStore);
+
 const handleSubmit = async () => {
   console.log('handleSubmit called');
-
   successMessage.value = '';
   errorMessage.value = '';
-
   try {
     const response = await api.post('/auth/login', {
       email: form.value.email,
       password: form.value.password
     });
-    const token = response.data.token;
-    const email = response.data.email;
-    console.log('API response:', response.data);
-    localStorage.setItem('AuthToken', token);
-    authStore.setUserEmail(email);
-    console.log('Saved email:', authStore.userEmail);
-    successMessage.value = 'Login successful!';
-    setTimeout(() => {
-      closeModal();
-      emit('login-success', token);
-    }, 2000);
+    if (response.status === 200) {
+      const token = response.data.token;
+      const email = response.data.email;
+      const userId = response.data.userId;
+
+      localStorage.setItem('AuthToken', token);
+      localStorage.setItem('userId', userId);
+      authStore.setUserEmail(email);
+      authStore.setUserId(userId);
+      successMessage.value = 'Login successful!';
+      setTimeout(() => {
+        closeModal();
+        emit('login-success', token);
+      }, 1500);
+    }
   } catch (error) {
+    console.error('Login error:', error); // Всегда полезно логировать ошибку в консоль
     if (error.response?.status === 401) {
       errorMessage.value = 'Invalid email or password.';
-    } else {
+    } else if (error.response?.status === 400) {
+      errorMessage.value = 'Bad request. Please check your input.';
+    } else if (error.response?.status === 500) {
+      errorMessage.value = 'Server error. Please try again later.';
+    } else if (error.request) {
+      errorMessage.value = 'Network error. Please check your connection.';
+    }
+    else {
       errorMessage.value = 'Error logging in. Please try again.';
     }
   }
 };
-
 
 </script>
 
@@ -70,7 +80,7 @@ const handleSubmit = async () => {
         <p v-if="successMessage" class="success">{{ successMessage }}</p>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         <div class="button-container">
-          <button @click="handleSubmit" type="submit">Login</button>
+          <button>Login</button>
         </div>
       </form>
       <i class="ri-close-line close" @click="closeModal"></i>

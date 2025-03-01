@@ -23,15 +23,24 @@ public class DiscountSpecification {
     }
 
 
-    public static Specification<Discount> hasDayOfWeek(Optional<DayOfWeek> dayOfWeek) {
+    public static Specification<Discount> hasDayOfWeek(Optional<DayOfWeek> dayOfWeek, boolean includeAllDays) {
         return (root, query, criteriaBuilder) -> {
             if (dayOfWeek.isPresent()) {
                 System.out.println("Applying filter for dayOfWeek: " + dayOfWeek.get());
+                if (includeAllDays) {
+                    return criteriaBuilder.or(
+                            criteriaBuilder.equal(root.get("dayOfWeek"), dayOfWeek.get()),
+                            criteriaBuilder.equal(root.get("dayOfWeek"), "ALL")
+                    );
+                } else {
+                    return criteriaBuilder.equal(root.get("dayOfWeek"), dayOfWeek.get());
+                }
+            } else {
+                return criteriaBuilder.conjunction(); // Возвращаем conjunction вместо null
             }
-            return dayOfWeek.map(day -> criteriaBuilder.equal(root.get("dayOfWeek"), day))
-                    .orElse(criteriaBuilder.conjunction());  // Возвращаем conjunction вместо null
         };
     }
+
 
 
     public static Specification<Discount> hasCardType(Optional<CardType> cardType) {

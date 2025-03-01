@@ -11,10 +11,14 @@
 </template>
 
 <script setup>
-import { defineProps, watch, ref, onMounted } from "vue";
-import axios from "axios";
+import { defineProps, ref, watch, onMounted, computed } from "vue";
+import api from '@/axios';
 import DiscountCard from "@/components/DiscountCard.vue";
+import { useAuthStore } from "@/store";
 
+
+const authStore = useAuthStore();
+const userId = computed(() => authStore.userId);
 const props = defineProps({
   selectedDay: String,
   selectedStore: String,
@@ -25,22 +29,17 @@ console.log("CardsContainer - selectedStore prop:", props.selectedStore);
 
 const discounts = ref([]);
 
-const getAllDiscounts = async () => {
-  try {
-    const response = await axios.get("http://localhost:8081/discounts");
-    discounts.value = response.data;
-  } catch (error) {
-    console.error("Error fetching all discounts", error);
-  }
-};
-
 const getDiscountsByFilter = async () => {
   console.log("CardsContainer - getDiscountsByFilter called");
   try {
-    const params ={};
+    console.log("AuthStore userId:", authStore.userId);
+    const params = {userId: userId.value};
+
     if(props.selectedDay && props.selectedDay !== "all") {
       params.dayOfWeek = props.selectedDay.toUpperCase();
+      params.includeAllDays = true;
     }
+
     if(props.selectedStore && props.selectedStore !== "all") {
       params.shopId = props.selectedStore;
     }
@@ -50,40 +49,42 @@ const getDiscountsByFilter = async () => {
     if(props.selectedCard && props.selectedCard !== "all") {
       params.cardType = props.selectedCard.toUpperCase();
     }
-    const response = await axios.get("http://localhost:8081/discounts/filter", {
-      params});
+    const response = await api.get("/discounts/filter",
+        {params});
     discounts.value = response.data;
   } catch (error) {
     console.error("Error fetching discounts", error);
   }
 };
 
-watch ([() => props.selectedDay, () => props.selectedStore, ()=>props.selectedBank, ()=>props.selectedCard], ([newDay, newStore,newBank,newCard]) => {
+watch(userId, (newUserId) => {
+  console.log("User ID changed:", newUserId);
+  if (newUserId) {
+    setTimeout(() => {
+      getDiscountsByFilter();
+    }, 1500);
+  } else {
+    discounts.value = [];
+  }
+});
+watch ([() => props.selectedDay, () => props.selectedStore, ()=>props.selectedBank, ()=>props.selectedCard], ([newDay, newStore, newBank, newCard]) => {
   if (
       (newDay === "all" || !newDay) &&
       (newStore === "all" || !newStore) &&
       (newBank === "all" || !newBank) &&
       (newCard === "all" || !newCard)
   ) {
-    getAllDiscounts();
+    getDiscountsByFilter();
   } else {
     getDiscountsByFilter();
   }
 }, { immediate: true });
 
 onMounted(() => {
-  if (
-      (!props.selectedDay || props.selectedDay === "all") &&
-      (!props.selectedStore || props.selectedStore === "all") &&
-      (!props.selectedBank || props.selectedBank === "all") &&
-      (!props.selectedCard || props.selectedCard === "all")
-  ) {
-    getAllDiscounts();
-  } else {
+  if (userId.value) {
     getDiscountsByFilter();
   }
 });
-
 const removeDiscountFromList = (id) => {
   discounts.value = discounts.value.filter(discount => discount.id !== id);
 };

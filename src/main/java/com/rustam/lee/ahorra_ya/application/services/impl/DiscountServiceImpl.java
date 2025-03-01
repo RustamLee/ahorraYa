@@ -1,10 +1,17 @@
 package com.rustam.lee.ahorra_ya.application.services.impl;
 
+import com.rustam.lee.ahorra_ya.core.domain.dto.DiscountRequestDTO;
+import com.rustam.lee.ahorra_ya.core.domain.entities.Bank;
 import com.rustam.lee.ahorra_ya.core.domain.entities.Discount;
+import com.rustam.lee.ahorra_ya.core.domain.entities.Shop;
+import com.rustam.lee.ahorra_ya.core.domain.entities.UserEntity;
 import com.rustam.lee.ahorra_ya.core.domain.enums.CardType;
 import com.rustam.lee.ahorra_ya.core.domain.enums.DayOfWeek;
 import com.rustam.lee.ahorra_ya.core.services.DiscountService;
+import com.rustam.lee.ahorra_ya.infrastructure.repositories.BankRepository;
 import com.rustam.lee.ahorra_ya.infrastructure.repositories.DiscountRepository;
+import com.rustam.lee.ahorra_ya.infrastructure.repositories.ShopRepository;
+import com.rustam.lee.ahorra_ya.infrastructure.repositories.UserRepository;
 import com.rustam.lee.ahorra_ya.infrastructure.specification.DiscountSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -20,11 +27,18 @@ import java.util.UUID;
 public class DiscountServiceImpl implements DiscountService {
 
     private final DiscountRepository discountRepository;
+    private final UserRepository userRepository;
+    private final ShopRepository shopRepository;
+    private final BankRepository bankRepository;
+
 
     // constructor
     @Autowired
-    public DiscountServiceImpl(DiscountRepository discountRepository) {
+    public DiscountServiceImpl(DiscountRepository discountRepository, UserRepository userRepository, ShopRepository shopRepository, BankRepository bankRepository) {
         this.discountRepository = discountRepository;
+        this.userRepository = userRepository;
+        this.shopRepository = shopRepository;
+        this.bankRepository = bankRepository;
     }
 
     // methods
@@ -35,37 +49,30 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Transactional
     @Override
-    public Discount createDiscount(Discount discount) {
-        if (discount.getId() != null) {
-            throw new IllegalArgumentException("Discount already has Id! ");
-        }
-        if(discount.getDayOfWeek()==null){
-            throw new IllegalArgumentException("Day of week is required");
-        }
-        if (discount.getDiscount() <= 0) {
-            throw new IllegalArgumentException("Discount must be greater than 0");
-        }
-        if(discount.getDiscountLimit() <= 0){
-            throw new IllegalArgumentException("Discount limit must be greater than 0");
-        }
-        if(discount.getCardType()==null){
-            throw new IllegalArgumentException("DiscountCard type is required");
-        }
-        if (discount.getLimitType() == null) {
-            throw new IllegalArgumentException("Limit type is required");
-        }
-        Discount discountToSave = new Discount(
-                discount.getUser(),
-                discount.getBank(),
-                discount.getShop(),
-                discount.getDayOfWeek(),
-                discount.getDiscount(),
-                discount.getDiscountLimit(),
-                discount.getCardType(),
-                discount.getLimitType(),
-                discount.getDetails()
+    public Discount createDiscount(DiscountRequestDTO discountRequestDTO) {
+        // Получаем сущности из репозиториев
+        UserEntity user = userRepository.findById(discountRequestDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Bank bank = bankRepository.findById(discountRequestDTO.getBankId())
+                .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
+
+        Shop shop = shopRepository.findById(discountRequestDTO.getShopId())
+                .orElseThrow(() -> new EntityNotFoundException("Shop not found"));
+
+        Discount discount = new Discount(
+                user,
+                bank,
+                shop,
+                discountRequestDTO.getDayOfWeek(),
+                discountRequestDTO.getDiscount(),
+                discountRequestDTO.getDiscountLimit(),
+                discountRequestDTO.getCardType(),
+                discountRequestDTO.getLimitType(),
+                discountRequestDTO.getDetails()
         );
-        return discountRepository.save(discountToSave);
+
+        return discountRepository.save(discount);
     }
 
     @Override
@@ -99,14 +106,18 @@ public class DiscountServiceImpl implements DiscountService {
                                                Optional<DayOfWeek> dayOfWeek,
                                                Optional<CardType> cardType,
                                                Optional<UUID> userId) {
+        boolean includeAllDays = dayOfWeek.isPresent() && !dayOfWeek.get().equals(DayOfWeek.ALL); // Если выбран конкретный день, включаем скидки на все дни
+
         Specification<Discount> spec = Specification.where(DiscountSpecification.hasBankName(bankId))
                 .and(DiscountSpecification.hasStoreName(shopId))
-                .and(DiscountSpecification.hasDayOfWeek(dayOfWeek))
+                .and(DiscountSpecification.hasDayOfWeek(dayOfWeek, includeAllDays))
                 .and(DiscountSpecification.hasCardType(cardType))
                 .and(DiscountSpecification.hasUserId(userId));
+
         System.out.println("Specification: " + spec);
 
         return discountRepository.findAll(spec);
     }
+
 
 }

@@ -24,7 +24,6 @@ import DiscountCard from "@/components/DiscountCard.vue";
 export default {
   name: "App",
   components: {
-
     HeaderApp: HeaderApp,
     CardsContainer: CardsContainer,
     DiscountCard: DiscountCard,
@@ -62,7 +61,6 @@ export default {
     };
   },
 };
-
 </script>
 
 <style>

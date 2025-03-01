@@ -1,13 +1,17 @@
 package com.rustam.lee.ahorra_ya.security;
 
+import java.util.UUID;
+
 public class AuthResponse {
 
     private String token;
     private String email;
+    private UUID userId;
 
-    public AuthResponse(String token, String email) {
+    public AuthResponse(String token, String email, UUID userId) {
         this.token = token;
         this.email = email;
+        this.userId = userId;
     }
 
     public String getToken() {
@@ -18,6 +22,7 @@ public class AuthResponse {
         return email;
     }
 
+
     // Сеттеры
     public void setToken(String token) {
         this.token = token;
@@ -27,4 +32,12 @@ public class AuthResponse {
         this.email = email;
     }
 
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
 }

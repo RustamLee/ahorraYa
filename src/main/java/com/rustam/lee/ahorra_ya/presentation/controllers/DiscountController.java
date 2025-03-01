@@ -1,5 +1,6 @@
 package com.rustam.lee.ahorra_ya.presentation.controllers;
 
+import com.rustam.lee.ahorra_ya.core.domain.dto.DiscountRequestDTO;
 import com.rustam.lee.ahorra_ya.core.domain.entities.Bank;
 import com.rustam.lee.ahorra_ya.core.domain.entities.Discount;
 import com.rustam.lee.ahorra_ya.core.domain.entities.Shop;
@@ -46,39 +47,21 @@ public class DiscountController {
     }
 
     // create discount
-    @PostMapping
-    public ResponseEntity<Discount> createDiscount(
-            @RequestParam UUID userId,
-            @RequestParam UUID bankId,
-            @RequestParam UUID shopId,
-            @RequestBody Discount discount) {
-
-        Optional<UserEntity> user = userService.getUserById(userId);
-        Optional<Bank> bank = bankService.getBankById(bankId);
-        Optional<Shop> shop = shopService.getShopById(shopId);
-
-        if (user.isEmpty() || bank.isEmpty() || shop.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        discount.setUser(user.get());
-        discount.setBank(bank.get());
-        discount.setShop(shop.get());
-
-        Discount createdDiscount = discountService.createDiscount(discount);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdDiscount);
+    @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Discount createDiscount(@RequestBody DiscountRequestDTO discountRequestDTO) {
+        return discountService.createDiscount(discountRequestDTO);
     }
 
     // delete discount
-    @DeleteMapping("/{discountId}")
+    @DeleteMapping("delete/{discountId}")
     public ResponseEntity<Void> deleteDiscount(@PathVariable UUID discountId){
         discountService.deleteDiscount(discountId);
         return ResponseEntity.noContent().build();
     }
 
     // get discount by id
-    @GetMapping("/{discountId}")
+    @GetMapping("get/{discountId}")
     public ResponseEntity<Discount> getDiscountById(@PathVariable UUID discountId) {
         Discount discount = discountService.getDiscountById(discountId);
 
@@ -90,7 +73,7 @@ public class DiscountController {
     }
 
     // update discount
-    @PutMapping("/{discountId}")
+    @PutMapping("update/{discountId}")
     public ResponseEntity<Discount> updateDiscount(
             @PathVariable UUID discountId,
             @RequestBody Discount updatedDiscount) {
@@ -101,22 +84,17 @@ public class DiscountController {
 
 
     // get discounts by filter  (bankName, storeName, dayOfWeek, cardType, userId)
-    @GetMapping ("/filter")
+    @GetMapping("/filter")
     public ResponseEntity<List<Discount>> getDiscountsByFilter(
             @RequestParam Optional<UUID> bankId,
             @RequestParam Optional<UUID> shopId,
             @RequestParam Optional<DayOfWeek> dayOfWeek,
             @RequestParam Optional<CardType> cardType,
             @RequestParam Optional<UUID> userId) {
-        System.out.println("Received parameters: ");
-        System.out.println("bankName: " + bankId);
-        System.out.println("shopId: " + shopId);
-        System.out.println("dayOfWeek: " + dayOfWeek);
-        System.out.println("cardType: " + cardType);
-        System.out.println("userId: " + userId);
 
         List<Discount> discounts = discountService.getDiscountsByFilter(bankId, shopId, dayOfWeek, cardType, userId);
         return ResponseEntity.ok(discounts);
     }
+
 
 }

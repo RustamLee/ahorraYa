@@ -1,7 +1,9 @@
 package com.rustam.lee.ahorra_ya.presentation.controllers;
 
+import com.rustam.lee.ahorra_ya.infrastructure.repositories.UserRepository;
 import com.rustam.lee.ahorra_ya.security.AuthRequest;
 import com.rustam.lee.ahorra_ya.security.AuthResponse;
+import com.rustam.lee.ahorra_ya.security.CustomUserDetails;
 import com.rustam.lee.ahorra_ya.security.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
 
+
     public AuthController(JwtTokenService jwtTokenService, AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
         this.jwtTokenService = jwtTokenService;
         this.authenticationManager = authenticationManager;
@@ -35,10 +38,13 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid email or password");
         }
         UserDetails user = userDetailsService.loadUserByUsername(authRequest.getEmail());
-        String token = jwtTokenService.generateToken(user.getUsername());
-        AuthResponse authResponse = new AuthResponse(token, user.getUsername());  // email здесь
-        return ResponseEntity.ok(authResponse);
+        if (user instanceof CustomUserDetails) {
+            CustomUserDetails customUser = (CustomUserDetails) user;
+            String token = jwtTokenService.generateToken(user.getUsername());
+            AuthResponse authResponse = new AuthResponse(token, user.getUsername(), customUser.getUserId());
+            return ResponseEntity.ok(authResponse);
+        } else {
+            return ResponseEntity.status(500).body("Internal Server Error");
+        }
     }
-
-
 }

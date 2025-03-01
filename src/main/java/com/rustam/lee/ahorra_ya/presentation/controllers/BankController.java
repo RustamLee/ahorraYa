@@ -24,7 +24,7 @@ public class BankController {
     }
 
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Bank> createBank(@RequestBody Bank bank) {
         Bank savedBank = bankService.createBank(bank);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBank);

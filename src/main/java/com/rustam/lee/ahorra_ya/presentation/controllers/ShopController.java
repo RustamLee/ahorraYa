@@ -21,7 +21,7 @@ public class ShopController {
     }
 
     // methods
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Shop > createShop(@RequestBody Shop shop) {
         Shop saveShop = shopService.createShop(shop);
         return ResponseEntity.status(HttpStatus.CREATED).body(saveShop);

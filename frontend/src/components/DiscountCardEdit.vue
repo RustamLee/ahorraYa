@@ -5,7 +5,16 @@
       <h2>Change Discount</h2>
       <div class="form-group">
         <label for="dayOfWeek">Day of week</label>
-        <input type="text" id="dayOfWeek" v-model="editedDiscount.dayOfWeek" />
+        <select id="dayOfWeek" v-model="editedDiscount.dayOfWeek">
+          <option value="MONDAY">Monday</option>
+          <option value="TUESDAY">Tuesday</option>
+          <option value="WEDNESDAY">Wednesday</option>
+          <option value="THURSDAY">Thursday</option>
+          <option value="FRIDAY">Friday</option>
+          <option value="SATURDAY">Saturday</option>
+          <option value="SUNDAY">Sunday</option>
+          <option value="ALL">All</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="discount">Discount<span> (in %)</span></label>
@@ -15,13 +24,24 @@
         <label for="discountLimit">Discount Limit <span> (in $)</span></label>
         <input type="number" id="discountLimit" v-model.number="editedDiscount.discountLimit" />
       </div>
+
+
       <div class="form-group">
-        <label for="limitType">Limit Type <span> (DAILY, WEEKLY or MONTHLY)</span></label>
-        <input type="text" id="limitType" v-model="editedDiscount.limitType" />
+        <label for="limitType">Limit Type <span></span></label>
+        <select v-model="editedDiscount.limitType" id="limitType">
+          <option value="DAILY">Daily</option>
+          <option value="WEEKLY">Weekly</option>
+          <option value="MONTHLY">Monthly</option>
+        </select>
       </div>
+
       <div class="form-group">
-        <label for="cardType">Card Type <span> (DEBIT or CREDIT)</span></label>
-        <input type="text" id="cardType" v-model="editedDiscount.cardType" />
+        <label for="cardType">Card Type <span></span></label>
+        <select v-model="editedDiscount.cardType" id="cardType">
+          <option value="DEBIT">Debit</option>
+          <option value="CREDIT">Credit</option>
+        </select>
+
       </div>
       <div class="form-group">
         <label for="details">Details <span> (text)</span></label>
@@ -34,7 +54,7 @@
 
 <script setup>
 import { defineProps, defineEmits, ref } from 'vue';
-import axios from 'axios';
+import api from "@/axios";
 
 const props = defineProps({
   discount: Object
@@ -46,7 +66,7 @@ const editedDiscount = ref({ ...props.discount });
 
 const saveChanges = async () => {
   try {
-    const response = await axios.put(`http://localhost:8081/discounts/${props.discount.id}`, editedDiscount.value);
+    const response = await api.put(`/discounts/update/${props.discount.id}`, editedDiscount.value);
     console.log("Discount updated");
     emit('discount-updated', response.data);
     closeModal();
@@ -61,6 +81,17 @@ const closeModal = () => {
 </script>
 
 <style scoped>
+
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #4e4e4e;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
 
 span{
   font-size: 12px;
@@ -132,5 +163,9 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin: 20px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

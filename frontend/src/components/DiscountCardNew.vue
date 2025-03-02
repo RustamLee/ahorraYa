@@ -101,9 +101,9 @@ const hideSuggestions = () => {
 const toast = useToast();
 const authStore = useAuthStore();
 const props = defineProps({
-  initialData: Object, // Если передается существующая скидка
+  initialData: Object,
 });
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(['close', 'save', 'new-discount']);
 const daysOfWeek = {
   MONDAY: "Monday",
   TUESDAY: "Tuesday",
@@ -176,6 +176,9 @@ const searchShops = _.debounce(async () => {
   }
 }, 500);
 
+const createDiscount = (newDiscountData) => {
+  emit('new-discount', newDiscountData);
+};
 
 const discountData = reactive({
   bankName: props.initialData?.bankName || "",
@@ -224,6 +227,7 @@ const submitDiscount = async () => {
       shopId,
       ...discountData,
     });
+    createDiscount(discountResponse.data);
     toast.success("Discount created successfully!");
     emit("save", discountResponse.data);
   } catch (error) {

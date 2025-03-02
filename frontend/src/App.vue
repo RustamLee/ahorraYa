@@ -4,11 +4,16 @@
                @store-changed="handleStoreChange"
                @bank-changed="handleBankChange"
                @card-changed="handleCardChange"
+               @new-discount="addDiscount"
     />
     <CardsContainer :selected-day="selectedDay"
                     :selected-store="selectedStore"
                     :selected-bank="selectedBank"
                     :selected-card="selectedCard"
+                    :discounts="discounts"
+                    @discount-deleted="removeDiscount"
+                    @discount-updated="updateDiscount"
+
     >
       <DiscountCard/>
     </CardsContainer>
@@ -16,10 +21,13 @@
 </template>
 
 <script>
-import {ref} from "vue";
+import {ref,watch, onMounted, computed } from "vue";
 import HeaderApp from "@/components/HeaderApp.vue";
 import CardsContainer from "@/components/CardsContainer.vue";
 import DiscountCard from "@/components/DiscountCard.vue";
+import api from "@/axios";
+import { useAuthStore } from "@/store";
+
 
 export default {
   name: "App",
@@ -29,10 +37,70 @@ export default {
     DiscountCard: DiscountCard,
   },
   setup() {
+    const discounts = ref([]);
     const selectedDay = ref("all");
     const selectedStore = ref("all");
     const selectedBank = ref("all");
     const selectedCard = ref("all");
+    const authStore = useAuthStore();
+    const userId = computed(() => authStore.userId);
+    const addDiscount = (newDiscount) => {
+      console.log('New discount received in App:', newDiscount);
+      discounts.value.push(newDiscount);
+      console.log('Updated discounts array:', discounts.value);
+    };
+    const getDiscountsByFilter = async () => {
+      console.log("App - getDiscountsByFilter called");
+      try {
+        console.log("AuthStore userId:", authStore.userId);
+        const params = { userId: userId.value };
+
+        if (selectedDay.value && selectedDay.value !== "all") {
+          params.dayOfWeek = selectedDay.value.toUpperCase();
+          params.includeAllDays = true;
+        }
+
+        if (selectedStore.value && selectedStore.value !== "all") {
+          params.shopId = selectedStore.value;
+        }
+        if (selectedBank.value && selectedBank.value !== "all") {
+          params.bankId = selectedBank.value;
+        }
+        if (selectedCard.value && selectedCard.value !== "all") {
+          params.cardType = selectedCard.value.toUpperCase();
+        }
+
+        const response = await api.get("/discounts/filter", { params });
+        discounts.value = response.data;
+      } catch (error) {
+        console.error("Error fetching discounts", error);
+      }
+    };
+
+    onMounted(() => {
+      if (userId.value) {
+        getDiscountsByFilter();
+      }
+    });
+
+    watch(userId, (newUserId) => {
+      console.log("User ID changed:", newUserId);
+      if (newUserId) {
+        setTimeout(() => {
+          getDiscountsByFilter();
+        }, 1500);
+      } else {
+        discounts.value = [];
+      }
+    });
+
+    watch(
+        [selectedDay, selectedStore, selectedBank, selectedCard],
+        () => {
+          getDiscountsByFilter();
+        }
+    );
+
     const handleDayChange = (newDay) => {
       selectedDay.value = newDay;
     };
@@ -49,7 +117,25 @@ export default {
       selectedCard.value = newCard;
     };
 
+    const removeDiscount = async (id) => {
+      try {
+        await api.delete(`/discounts/delete/${id}`);
+        console.log("Discount deleted");
+        discounts.value = discounts.value.filter(discount => discount.id !== id);
+      } catch (error) {
+        console.error("Error deleting discount", error);
+      }
+    };
+
+    const updateDiscount = (updatedDiscount) => {
+      const index = discounts.value.findIndex(discount => discount.id === updatedDiscount.id);
+      if (index !== -1) {
+        discounts.value[index] = updatedDiscount;
+      }
+    };
+
     return {
+      discounts,
       selectedDay,
       selectedStore,
       selectedBank,
@@ -58,8 +144,11 @@ export default {
       handleStoreChange,
       handleBankChange,
       handleCardChange,
+      removeDiscount,
+      updateDiscount,
+      addDiscount,
     };
-  },
+  }
 };
 </script>
 

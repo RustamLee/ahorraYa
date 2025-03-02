@@ -2,6 +2,7 @@
 import {defineEmits, ref} from 'vue';
 import api from '@/axios';
 import {useAuthStore} from "@/store";
+import {useToast} from "vue-toastification";
 
 const authStore = useAuthStore();
 const emit = defineEmits(['close', 'login-success']);
@@ -9,7 +10,7 @@ const form = ref({
   email: '',
   password: ''
 });
-
+const toast = useToast();
 const errorMessage = ref('');
 const successMessage = ref('');
 
@@ -40,6 +41,7 @@ const handleSubmit = async () => {
       authStore.setUserEmail(email);
       authStore.setUserId(userId);
       successMessage.value = 'Login successful!';
+      toast.success("Successful Log in!");
       setTimeout(() => {
         closeModal();
         emit('login-success', token);

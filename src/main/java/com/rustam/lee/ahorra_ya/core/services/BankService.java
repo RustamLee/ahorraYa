@@ -11,4 +11,5 @@ public interface BankService {
     List<Bank> getAllBanks();
     Bank createBank(Bank bank);
     void deleteBank(UUID bankId);
+    List<Bank> searchBanks(String query);
 }

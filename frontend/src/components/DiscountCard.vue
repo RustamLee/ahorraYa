@@ -1,23 +1,14 @@
 <script setup>
 import {defineProps, defineEmits, ref} from 'vue';
-import axios from "axios";
 
-import DiscountCardModal from "@/components/DiscountCardModal.vue";
+import DiscountCardEdit from "@/components/DiscountCardEdit.vue";
 const showModal = ref(false);
 
 const props = defineProps({
   discount: Object
 });
 const emit = defineEmits(['discount-deleted','discount-updated']);
-const deleteDiscount = async () => {
-  try {
-    await axios.delete(`http://localhost:8081/discounts/${props.discount.id}`);
-    console.log("Discount deleted");
-    emit('discount-deleted', props.discount.id);
-  } catch (error) {
-    console.error("Error deleting discount", error);
-  }
-};
+
 const openModal = () => {
   showModal.value = true;
 };
@@ -29,6 +20,10 @@ const closeModal = () => {
 const handleDiscountUpdated = (updatedDiscount) => {
   emit('discount-updated', updatedDiscount);
 };
+
+const  onDeleteClicked = () => {
+  emit('discount-deleted', props.discount.id);
+}
 </script>
 
 <template>
@@ -50,7 +45,7 @@ const handleDiscountUpdated = (updatedDiscount) => {
       <div>{{ discount.discount }}%</div>
       <div>{{ discount.discountLimit }}$</div>
       <div>{{discount.limitType}}</div>
-      <div class="edit-icon" @click="deleteDiscount"><i class="ri-delete-bin-line"></i></div>
+      <div class="edit-icon" @click="onDeleteClicked"><i class="ri-delete-bin-line"></i></div>
     </div>
 
     <div class="days-row">
@@ -68,7 +63,7 @@ const handleDiscountUpdated = (updatedDiscount) => {
       <div class="details-text">{{ discount.details }}</div>
     </div>
 
-    <DiscountCardModal
+    <DiscountCardEdit
         v-show="showModal"
         :discount="discount"
         @close="closeModal"
@@ -141,11 +136,6 @@ padding-left: 10px;
   cursor: pointer;
   color: #007BFF;
   font-size: 20px;
-}
-.header-row-edit{
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
 }
 
 .days-row > div {

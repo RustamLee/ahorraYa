@@ -11,4 +11,5 @@ public interface ShopService {
     List<Shop> getAllShops();
     Shop createShop(Shop shop);
     void deleteShop(UUID shopId);
+    List<Shop> searchShops(String query);
 }

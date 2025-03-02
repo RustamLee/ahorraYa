@@ -9,7 +9,10 @@
       <!-- filters -->
       <div class="filters-container">
         <label for="day-filter">Day
-          <select id="day-filter" @change="handleDayChange">
+          <select
+              id="day-filter"
+              @change="handleDayChange"
+              :disabled="!userEmail">
             <option value="all">All</option>
             <option value="monday">Monday</option>
             <option value="tuesday">Tuesday</option>
@@ -22,9 +25,11 @@
         </label>
         <label>
           Store
-          <select v-model="selectedStore"
-                  @change="handleStoreChange"
-                  id="store-filter">
+          <select
+              v-model="selectedStore"
+              @change="handleStoreChange"
+              id="store-filter"
+              :disabled="!userEmail">
             <option value="all">All</option>
             <option v-for="shop in shops" :key="shop.id" :value="shop.id">{{ shop.name }}</option>
           </select>
@@ -34,7 +39,8 @@
           Bank
           <select v-model="selectedBank"
                   @change="handleBankChange"
-                  id="bank-filter">
+                  id="bank-filter"
+                  :disabled="!userEmail">
             <option value="all">All</option>
             <option v-for="bank in banks" :key="bank.id" :value="bank.id">{{ bank.name }}</option>
           </select>
@@ -42,15 +48,17 @@
 
         <label for="card-filter">
           Card
-          <select id="card-filter" @change="handleCardChange"
-          >
+          <select
+              id="card-filter"
+              @change="handleCardChange"
+              :disabled="!userEmail">
             <option value="all">All</option>
             <option value="debit">Debit</option>
             <option value="credit">Credit</option>
           </select>
         </label>
         <label v-if="userEmail">
-          <button class="new-card"  @click="openModal">new card</button>
+          <button class="new-card" @click="openModal">new card</button>
         </label>
       </div>
 
@@ -72,10 +80,10 @@
         @login="showRegisterModal = false;
                 showLoginModal = true"/>
     <LoginModal v-if="showLoginModal" @close="showLoginModal = false"/>
-    <CardModal
+    <DiscountCardNew
         v-if="isModalOpen"
         @close="isModalOpen = false"
-        @save="handleSave"
+        @new-discount="$emit('new-discount', $event)"
     />
   </header>
 </template>
@@ -86,7 +94,7 @@ import {watchEffect} from 'vue';
 import RegisterModal from "@/components/RegisterModal.vue";
 import LoginModal from "@/components/LoginModal.vue";
 import {useAuthStore} from "@/store";
-import CardModal from "@/components/CardModal.vue";
+import DiscountCardNew from "@/components/DiscountCardNew.vue";
 import api from "@/axios";
 
 const isModalOpen = ref(false);
@@ -95,17 +103,12 @@ const userEmail = ref(authStore.userEmail);
 const openModal = () => {
   isModalOpen.value = true;
 };
-const handleSave = (cardData) => {
-  console.log('Saving new card:', cardData);
-  // Тут можно вызвать API для сохранения новой карточки
-  isModalOpen.value = false;
-};
 
 watchEffect(() => {
   userEmail.value = authStore.userEmail;
   console.log('Updated userEmail:', userEmail.value);
 });
-const emit = defineEmits(['day-changed', 'store-changed', 'bank-changed', 'card-changed']);
+const emit = defineEmits(['day-changed', 'store-changed', 'bank-changed', 'card-changed', 'new-discount']);
 const shops = ref([]);
 const banks = ref([]);
 const selectedStore = ref('all');
@@ -295,6 +298,11 @@ header {
   justify-content: space-between;
   align-items: flex-start;
   padding: 5px;
+}
+
+select:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 </style>

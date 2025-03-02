@@ -82,7 +82,6 @@ public class DiscountController {
         return ResponseEntity.ok(updated);
     }
 
-
     // get discounts by filter  (bankName, storeName, dayOfWeek, cardType, userId)
     @GetMapping("/filter")
     public ResponseEntity<List<Discount>> getDiscountsByFilter(

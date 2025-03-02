@@ -39,4 +39,9 @@ public class BankServiceImpl implements BankService {
     public void deleteBank(UUID bankId) {
         bankRepository.deleteById(bankId);
     }
+
+    @Override
+    public List<Bank> searchBanks(String query) {
+        return bankRepository.findByNameContaining(query);
+    }
 }

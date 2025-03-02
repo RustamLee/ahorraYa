@@ -36,4 +36,9 @@ public class ShopServiceImpl implements ShopService {
     public void deleteShop(UUID shopId) {
         shopRepository.deleteById(shopId);
     }
+
+    @Override
+    public List<Shop> searchShops(String query) {
+        return shopRepository.findByNameContaining(query);
+    }
 }

@@ -36,4 +36,10 @@ public class BankController {
         return ResponseEntity.ok(banks);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Bank>> searchBanks(@RequestParam String query) {
+        List<Bank> banks = bankService.searchBanks(query);
+        return ResponseEntity.ok(banks);
+    }
+
 }

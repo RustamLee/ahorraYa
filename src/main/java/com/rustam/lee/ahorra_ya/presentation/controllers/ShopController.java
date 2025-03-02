@@ -33,5 +33,10 @@ public class ShopController {
         return ResponseEntity.ok(shops);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Shop>> searchShops(@RequestParam String query) {
+        List<Shop> shops = shopService.searchShops(query);
+        return ResponseEntity.ok(shops);
+    }
 
 }

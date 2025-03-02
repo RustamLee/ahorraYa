@@ -1,7 +1,7 @@
 <script setup>
 import {defineEmits, ref, toRaw} from 'vue';
 import axios from "axios";
-
+import {useToast} from 'vue-toastification';
 const emit = defineEmits(['close', 'register-success', 'login']);
 const form = ref({
   email: '',
@@ -11,6 +11,7 @@ const form = ref({
 const errorMessage = ref('');
 const successMessage = ref("");
 const showLogin = ref(false);
+const toast = useToast();
 
 const closeModal = () => {
   successMessage.value = "";
@@ -34,6 +35,7 @@ const handleSubmit = async () => {
     });
 
     successMessage.value = "Registration successful!";
+    toast.success("Successful registration! Log in!");
     setTimeout(() => {
       closeModal();
       emit("register-success");

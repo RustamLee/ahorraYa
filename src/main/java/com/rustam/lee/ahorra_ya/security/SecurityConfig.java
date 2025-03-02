@@ -57,6 +57,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/banks/create").authenticated()
                         .requestMatchers(HttpMethod.POST, "/shops/create").authenticated()
                         .requestMatchers(HttpMethod.POST, "/discounts/create").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/shops").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/banks").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

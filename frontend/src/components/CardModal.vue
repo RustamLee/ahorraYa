@@ -1,17 +1,33 @@
 <template>
   <div class="modal" @click.self="closeModal">
     <div class="modal-content">
-      <i class="ri-close-line close" @click="closeModal"></i>
+      <i class="ri-close-line close" @click="closeModal" @click.self="hideSuggestions"></i>
       <h2> Discount Card</h2>
       <form @submit.prevent="submitDiscount">
+
+
         <div class="form-group">
           <label for="bankName">Bank</label>
-          <input required type="text" id="bankName" v-model="discountData.bankName"/>
+          <input required type="text" id="bankName" v-model="discountData.bankName" @input="searchBanks"/>
+          <ul v-if="banksSuggestions.length > 0" class="suggestions">
+            <li v-for="bank in banksSuggestions" :key="bank.id" @click="selectBank(bank)">
+              {{ bank.name }}
+            </li>
+          </ul>
         </div>
+
+
         <div class="form-group">
           <label for="shopName">Store</label>
-          <input required type="text" id="shopName" v-model="discountData.shopName"/>
+          <input required type="text" id="shopName" v-model="discountData.shopName" @input="searchShops"/>
+          <ul v-if="shopsSuggestions.length > 0" class="suggestions">
+            <li v-for="shop in shopsSuggestions" :key="shop.id" @click="selectShop(shop)">
+              {{ shop.name }}
+            </li>
+          </ul>
         </div>
+
+
         <div class="form-group">
           <label for="discount">Discount <span>(%)</span></label>
           <input required
@@ -73,10 +89,15 @@
 
 <script setup>
 import api from "@/axios";
-import { useToast } from 'vue-toastification';
+import {useToast} from 'vue-toastification';
 import {defineProps, defineEmits, reactive, ref} from 'vue';
 import {useAuthStore} from "@/store";
+import _ from 'lodash';
 
+const hideSuggestions = () => {
+  banksSuggestions.value = [];
+  shopsSuggestions.value = [];
+};
 const toast = useToast();
 const authStore = useAuthStore();
 const props = defineProps({
@@ -105,6 +126,56 @@ const cardType = {
   CREDIT: "Credit",
 };
 
+const banksSuggestions = ref([]);
+const shopsSuggestions = ref([]);
+
+
+const selectBank = (bank) => {
+  discountData.bankName = bank.name;
+  selectedBank.value = bank;
+  banksSuggestions.value = [];
+};
+
+const selectShop = (shop) => {
+  discountData.shopName = shop.name;
+  selectedShop.value = shop;
+  shopsSuggestions.value = [];
+};
+
+const selectedBank = ref(null);
+const selectedShop = ref(null);
+
+
+const searchBanks = _.debounce(async () => {
+  if (discountData.bankName.length > 2) {
+    try {
+      const response = await api.get("/banks/search", {
+        params: {query: discountData.bankName}
+      });
+      banksSuggestions.value = response.data;
+    } catch (error) {
+      console.error("Error fetching banks:", error);
+    }
+  } else {
+    banksSuggestions.value = [];
+  }
+}, 500);
+
+const searchShops = _.debounce(async () => {
+  if (discountData.shopName.length > 2) {
+    try {
+      const response = await api.get("/shops/search", {
+        params: {query: discountData.shopName}
+      });
+      shopsSuggestions.value = response.data;
+    } catch (error) {
+      console.error("Error fetching shops:", error);
+    }
+  } else {
+    shopsSuggestions.value = [];
+  }
+}, 500);
+
 
 const discountData = reactive({
   bankName: props.initialData?.bankName || "",
@@ -130,10 +201,23 @@ const submitDiscount = async () => {
     const userEmail = authStore.userEmail;
     if (!userEmail) throw new Error("User not authenticated");
     const userId = authStore.userId;
-    const bankResponse = await api.post("/banks/create", {name: discountData.bankName});
-    const bankId = bankResponse.data.id;
-    const shopResponse = await api.post("/shops/create", {name: discountData.shopName});
-    const shopId = shopResponse.data.id;
+
+    let bankId, shopId;
+    if (selectedBank.value) {
+      bankId = selectedBank.value.id;
+    } else {
+      const bankResponse = await api.post("/banks/create", {name: discountData.bankName});
+      bankId = bankResponse.data.id;
+    }
+
+    if (selectedShop.value) {
+      shopId = selectedShop.value.id;
+    } else {
+      const shopResponse = await api.post("/shops/create", {name: discountData.shopName});
+      shopId = shopResponse.data.id;
+    }
+
+
     const discountResponse = await api.post("/discounts/create", {
       userId,
       bankId,
@@ -154,6 +238,25 @@ const submitDiscount = async () => {
 
 <style scoped>
 
+ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li{
+  display: flex;
+  margin-bottom: 2px;
+  margin-left: 5px;
+}
+
+ul li:hover {
+  content: "✔";
+  background-color: #4cb050;
+  cursor: pointer;
+  color: black;
+}
+
 .error-border {
   border: 1px solid red;
 }
@@ -173,7 +276,7 @@ span {
   font-size: 12px;
 }
 
-textarea{
+textarea {
   font-size: 14px;
   font-family: 'Poppins', sans-serif;
   color: #4e4e4e;

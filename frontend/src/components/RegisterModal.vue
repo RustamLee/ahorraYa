@@ -26,9 +26,8 @@ const handleSubmit = async () => {
   showLogin.value = false;
 
   try {
-    const rawData = toRaw(form.value);  // Убираем прокси
+    const rawData = toRaw(form.value);
     console.log("Sending data:", rawData);
-
     await api.post("/users/register", {
       email: rawData.email,
       password: rawData.password

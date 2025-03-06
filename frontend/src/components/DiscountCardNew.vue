@@ -305,10 +305,14 @@ h2 {
 .modal-content {
   background-color: white;
   padding: 20px;
-  border-radius: 8px;
-  width: 400px;
+  border-radius: 5px;
   position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  max-width: 400px;
+  width: 100%;
 }
 
 .close {

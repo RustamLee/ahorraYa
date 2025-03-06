@@ -17,9 +17,13 @@
     >
       <DiscountCard/>
     </CardsContainer>
+    <footer class="footer">
+      <div class="footer-content">
+        © 2025 AhorraYa. All rights reserved.
+      </div>
+    </footer>
   </div>
 </template>
-
 <script>
 import {ref,watch, onMounted, computed } from "vue";
 import HeaderApp from "@/components/HeaderApp.vue";
@@ -32,7 +36,7 @@ import { useAuthStore } from "@/store";
 export default {
   name: "App",
   components: {
-    HeaderApp: HeaderApp,
+       HeaderApp: HeaderApp,
     CardsContainer: CardsContainer,
     DiscountCard: DiscountCard,
   },
@@ -153,11 +157,29 @@ export default {
 </script>
 
 <style>
+footer {
+  text-align: left;
+  padding: 10px;
+  background-color: #ffe602;
+  color: #333;
+  font-size: 14px;
+  margin-top: auto;
+  position: relative;
+}
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto; /* Центрирует содержимое футера */
+  width: 100%;
+}
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
 }
 
 body, html {
@@ -167,5 +189,8 @@ body, html {
   margin: 0;
   padding: 0;
   color: #4e4e4e;
+  width: 100%;
+  border: 1px solid red;
 }
+
 </style>

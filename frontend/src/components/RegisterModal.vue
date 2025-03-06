@@ -1,6 +1,6 @@
 <script setup>
 import {defineEmits, ref, toRaw} from 'vue';
-import axios from "axios";
+import api from '@/axios';
 import {useToast} from 'vue-toastification';
 const emit = defineEmits(['close', 'register-success', 'login']);
 const form = ref({
@@ -29,7 +29,7 @@ const handleSubmit = async () => {
     const rawData = toRaw(form.value);  // Убираем прокси
     console.log("Sending data:", rawData);
 
-    await axios.post("http://localhost:8081/users/register", {
+    await api.post("/users/register", {
       email: rawData.email,
       password: rawData.password
     });

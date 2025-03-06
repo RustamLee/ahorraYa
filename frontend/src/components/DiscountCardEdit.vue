@@ -117,8 +117,13 @@ h2{
   background-color: white;
   padding: 20px;
   border-radius: 5px;
-  width-max: 500px;
   position: relative;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  width: 100%;
 }
 
 .close {
@@ -147,7 +152,7 @@ label {
 input[type="text"],
 input[type="number"],
 textarea {
-  width: 350px;
+  width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;

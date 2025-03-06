@@ -3,12 +3,15 @@
     <div class="header-content">
       <div class="logo-container">
         <h1 class="app-name">AhorraYa</h1>
-        <p class="slogan">Save money with us</p>
+        <p class="slogan" @click="isAboutModalOpen = true">About project <i class="ri-information-line"></i></p>
       </div>
 
       <!-- filters -->
-      <div class="filters-container">
-        <label for="day-filter">Day
+      <div class="burger-menu" @click="isFiltersOpen = !isFiltersOpen">
+        <i class="ri-menu-line"></i>
+      </div>
+      <div class="filters-container" :class="{ 'open': isFiltersOpen }">
+        <label for="day-filter">Day&nbsp;
           <select
               id="day-filter"
               @change="handleDayChange"
@@ -57,18 +60,17 @@
             <option value="credit">Credit</option>
           </select>
         </label>
-        <label v-if="userEmail">
-          <button class="new-card" @click="openModal">new card</button>
-        </label>
       </div>
-
+      <label v-if="userEmail">
+        <button class="new-card" @click="openModal">+ card</button>
+      </label>
       <div class="right-section">
         <div v-if="userEmail" class="user-info">
           <span class="user-name">{{ userEmail }}</span>
-          <button @click="authStore.logout()" class="register-btn">Log Out</button>
+          <button @click="authStore.logout()" class="register-btn">Log Out<i class="ri-logout-circle-r-line"></i></button>
         </div>
         <div v-else class="nav">
-          <button @click="showLoginModal = true" class="register-btn">Log In</button>
+          <button @click="showLoginModal = true" class="register-btn">Log In<i class="ri-login-circle-line"></i></button>
           <button @click="showRegisterModal = true" class="register-btn">Sign Up</button>
         </div>
 
@@ -80,11 +82,11 @@
         @login="showRegisterModal = false;
                 showLoginModal = true"/>
     <LoginModal v-if="showLoginModal" @close="showLoginModal = false"/>
-    <DiscountCardNew
-        v-if="isModalOpen"
+    <DiscountCardNew v-if="isModalOpen"
         @close="isModalOpen = false"
         @new-discount="$emit('new-discount', $event)"
     />
+    <AboutModal :isOpen="isAboutModalOpen" @close="isAboutModalOpen = false" />
   </header>
 </template>
 
@@ -96,8 +98,10 @@ import LoginModal from "@/components/LoginModal.vue";
 import {useAuthStore} from "@/store";
 import DiscountCardNew from "@/components/DiscountCardNew.vue";
 import api from "@/axios";
-
+import AboutModal from "@/components/AboutModal.vue";
+const isAboutModalOpen = ref(false);
 const isModalOpen = ref(false);
+const isFiltersOpen = ref(false);
 const authStore = useAuthStore();
 const userEmail = ref(authStore.userEmail);
 const openModal = () => {
@@ -158,7 +162,26 @@ function handleBankChange() {
 
 onMounted(getBanks);
 </script>
-<style>
+
+<style scoped>
+
+header {
+  background-color: #ffe602;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.header-content {
+  max-width: 1200px;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
 
 .register-btn {
   color: #4e4e4e;
@@ -177,6 +200,10 @@ onMounted(getBanks);
 
 .new-card {
   font-size: 16px;
+  margin-right: 10px;
+  margin-left: 10px;
+  display: flex;
+  margin-top: 40px;
 }
 
 button {
@@ -195,38 +222,58 @@ button {
   border-radius: 5px;
   height: 18px;
   text-align: center;
-
+  gap: 7px;
+  transition: all 0.3s;
 }
 
-header {
-  background-color: #ffe602;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+button i {
+  font-size: 16px;
+  line-height: 1;
 }
 
-.header-content {
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-  box-sizing: border-box;
-  height: 100px;
-  display: flex;
-  max-width: 1200px;
+.logo-container {
+  text-align: left;
+  margin-left: 0;
+  margin-top: -10px;
+}
+
+.slogan {
+  font-size: 16px;
+  font-weight: normal;
+  align-self: flex-end;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.slogan:hover {
+  color: #2869d6;
+}
+
+button:hover {
+  color: #2869d6;
+}
+
+.slogan i {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.app-name, .slogan {
+  margin: 0;
 }
 
 .filters-container {
   display: flex;
-  gap: 10px;
   justify-content: space-between;
   align-items: flex-end;
-  height: 100%;
+  gap: 10px;
   font-size: 14px;
   font-weight: normal;
   color: #4e4e4e;
   position: relative;
+  height: 100%;
 }
 
 .filters-container select {
@@ -251,22 +298,9 @@ header {
   color: #4e4e4e;
 }
 
-
-.logo-container {
-  text-align: left;
-  justify-content: flex-start;
-}
-
 .app-name {
   font-size: 2rem;
   margin: 0;
-}
-
-.slogan {
-  font-size: 14px;
-  margin-top: 5px;
-  font-weight: normal;
-  align-self: flex-end;
 }
 
 .right-section {
@@ -284,11 +318,13 @@ header {
   align-items: start;
   justify-content: space-between;
   height: 100%;
-  padding: 5px;
+  padding-top: 5px;
 }
 
 .user-name {
   font-size: 1rem;
+  cursor: none;
+  transition: all 0.3s;
 }
 
 .nav {
@@ -303,6 +339,118 @@ header {
 select:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.burger-menu {
+  padding: 10px;
+  display: none;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .filters-container {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 70%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 10;
+    background: #fff;
+  }
+
+  .filters-container.open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    height: fit-content;
+  }
+
+  .burger-menu {
+    display: block;
+  }
+
+  .filters-container label {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .filters-container select {
+    width: 50vw;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 8px;
+  }
+
+  .new-card {
+    font-size: 16px;
+    display: flex;
+    width: 68px;
+    height: 40px;
+    margin-top: 10px;
+  }
+
+}
+
+
+
+@media (max-width: 480px) {
+
+  .slogan {
+    font-size: 14px;
+    gap: 5px;
+    display: inline;
+  }
+
+  .new-card {
+    font-size: 16px;
+    display: flex;
+    width: 40px;
+    height: 30px;
+    margin-top: 14px;
+  }
+
+  .app-name{
+    font-size: 1.5rem;
+    margin-top: 10px;
+  }
+
+}
+
+@media (max-width: 415px) {
+
+  .new-card {
+    font-size: 14px;
+    display: flex;
+    width: 20px;
+    height: 20px;
+    margin-top: 14px;
+  }
+
+  .app-name{
+    font-size: 1rem;
+    margin-top: 20px;
+  }
+
+  .user-name{
+    display: none;
+  }
+
+  .register-btn{
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .slogan i {
+    display: none;
+  }
+
 }
 
 </style>

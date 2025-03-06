@@ -42,4 +42,10 @@ const handleDiscountUpdated = (updatedDiscount) => {
   padding: 20px;
   gap: 16px;
 }
+
+@media (max-width: 400px) {
+  .cards_container {
+    padding: 1px;
+  }
+}
 </style>

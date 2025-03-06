@@ -190,7 +190,6 @@ body, html {
   padding: 0;
   color: #4e4e4e;
   width: 100%;
-  border: 1px solid red;
 }
 
 </style>
